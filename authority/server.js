@@ -15,6 +15,7 @@ server.httpServer =http.createServer(function (req, res) {
 
 // Request handler logic 
 server.reqHandler = function(req,res){
+    console.log("Req rec");
     // Get the URL and parse it 
     var parsedUrl = url.parse(req.url,true);   
     

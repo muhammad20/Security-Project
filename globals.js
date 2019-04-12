@@ -15,7 +15,7 @@ globals.authorityPublicKey = "-----BEGIN PUBLIC KEY-----\n"+
 "pQIDAQAB\n"+
 "-----END PUBLIC KEY-----";
 
-globals.popId = 1;
+globals.bobId = 1;
 
 globals.aliceId = 2;
 
