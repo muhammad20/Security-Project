@@ -17,4 +17,8 @@ globals.authorityPublicKey = "-----BEGIN PUBLIC KEY-----\n"+
 "pQIDAQAB\n"+
 "-----END PUBLIC KEY-----";
 
+globals.bobId = 1;
+
+globals.aliceId = 2;
+
 module.exports = globals;

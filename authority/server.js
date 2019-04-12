@@ -15,6 +15,7 @@ server.httpServer =http.createServer(function (req, res) {
 
 // Request handler logic 
 server.reqHandler = function(req,res){
+    console.log("Req rec");
     // Get the URL and parse it 
     var parsedUrl = url.parse(req.url,true);   
     
@@ -31,7 +32,7 @@ server.reqHandler = function(req,res){
     if(method=="get" && id ){
         
         // Try to read the certificate of the user with this id
-        _data.read("certificates",id,"cert",function(err,data){
+        _data.read(__dirname+"/certificates",id,"cert",function(err,data){
             // If there is a certificate for this id 
             if(!err && data){
                 res.writeHead(200);
