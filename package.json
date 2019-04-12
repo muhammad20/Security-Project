@@ -1,0 +1,17 @@
+{
+  "requires": true,
+  "lockfileVersion": 1,
+  "dependencies": {
+    "big-integer": {
+      "integrity": "sha512-9dULc9jsKmXl0Aeunug8wbF+58n+hQoFjqClN7WeZwGLh0XJUWyJJ9Ee+Ep+Ql/J9fRsTVaeThp8MhiCCrY0Jg==",
+      "resolved": "https://registry.npmjs.org/big-integer/-/big-integer-1.6.43.tgz",
+      "version": "1.6.43"
+    },
+    "fast-sha256": {
+      "integrity": "sha1-tkAYlAPH/w15bRJRocH2lUxA57Q=",
+      "resolved": "https://registry.npmjs.org/fast-sha256/-/fast-sha256-1.1.0.tgz",
+      "version": "1.1.0"
+    },
+    "socket.io": "^2.2.0"
+  }
+}
