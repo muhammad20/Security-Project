@@ -5,7 +5,7 @@ const StringDecoder = require('string_decoder').StringDecoder;
 const globals = require('./../globals');
 
 // Send a get request to the certificate authority with query string parameter with pop's id 
-var getBobsCertificate = function (callback) {
+const getBobsCertificate = function (callback) {
 
     // Options to be passed to the request module
     const requestOptions = {
@@ -16,13 +16,13 @@ var getBobsCertificate = function (callback) {
         'path': '?id=' + globals.bobId
     };
     console.log("ok");
-    var xx = http.request("http://localhost:9000/?id="+globals.bobId, function (res) {
+    var certRequest = http.request("http://localhost:9000/?id="+globals.bobId, function (res) {
         callback(res);
     });
-    xx.end();
+    certRequest.end();
 };
 
-var x = function (res) {
+const x = function (res) {
     var buffer = '';
     var stringDecoder = new StringDecoder('utf-8');
  
@@ -35,4 +35,13 @@ var x = function (res) {
         console.log(buffer);
     });
 }
+
+// Verify the certificate by decrypting it with the authority public key 
+const verifyCertificate = function(certificate){
+    
+    const publicKey = globals.authorityPublicKey;
+
+    
+}
+
 getBobsCertificate(x);
