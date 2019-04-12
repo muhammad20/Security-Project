@@ -6,4 +6,4 @@
      run from within keys folder
 
 --"certificates" folder contains the certificates that the authority holds with X.509 format
--- opensslbas
+-- run gen_random_certs.sh to generate random certificates 

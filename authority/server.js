@@ -7,7 +7,7 @@ const _data = require('./../file_handler');
 // Declare the server template
 const server = {}
 
-// Server startup logic
+// Create the server, and define its entry point
 server.httpServer =http.createServer(function (req, res) {
         server.reqHandler(req,res);
     });
@@ -29,12 +29,14 @@ server.reqHandler = function(req,res){
     
     // If the request was sent sucessfully, Start the logic
     if(method=="get" && id ){
-        console.log("reading");
+        
+        // Try to read the certificate of the user with this id
         _data.read("certificates",id,"cert",function(err,data){
+            // If there is a certificate for this id 
             if(!err && data){
                 res.writeHead(200);
                 res.end(data);
-            }else{
+            }else{ // No certificate
                 console.log(err);
                 res.writeHead(404)
                 res.end();
@@ -44,11 +46,15 @@ server.reqHandler = function(req,res){
 };
 
 
+// The port at which the server is running
+server.port = 9000;
 
+// Server startup logic (Which port and callback after successful startup)
 server.init = function () {
-    server.httpServer.listen(9000,function(){
+    server.httpServer.listen(server.port,function(){
         console.log('Authority server is running');
     });
-};
+};  
 
+// runs the server
 server.init();
