@@ -80,10 +80,10 @@ async function elgamalDS(msg, q, a, x) {
 
     //choose rand integer  1 < k < q-1
 
-    var k = Math.floor(Math.random() * (1000000 - 1) + 1);
+    var k = Math.floor(Math.random() * (10000000000 - 1) + 1);
     console.log(k)
     while (gcd(k, q_1) != 1) {
-        var k = Math.floor(Math.random() * (1000000 - 1) + 1);
+        var k = Math.floor(Math.random() * (10000000000 - 1) + 1);
     }
 
     console.log(k);
