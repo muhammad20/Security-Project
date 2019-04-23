@@ -32,22 +32,30 @@ const verifyEncrypedCertificate = function(encryptedCertificate, callback) {
     return recData.includes('CERTIFICATE');
 }
 
+const verifyAliceSignature = function(certificate) {
+    verifyEncrypedCertificate()
+}
 
+const readAlicesMessage = function() {
+    fileHandler.read(__dirname + "../", "msg","txt", function(err, msg) {
+        if(!err && msg) {
+            fileHandler.read(__dirname + "/keys", "private", "key", function(err, key) {
+                var bob_private_key = new NodeRSA(key);
+                var decryptedMessage = bob_private_key.decrypt(msg);
+                callback(decryptedMessage);
+            });
+        }
+    });
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+const receiveMsg = function() {
+    var msg = readAlicesMessage();
+    var aliceCert;
+    getAliceCertificate(function(cert) {
+        aliceCert = cert;
+    });
+    
+}
 
 
 // a test case used @ elgamal-ds

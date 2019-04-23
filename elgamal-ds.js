@@ -73,9 +73,22 @@ elgamal.verify = function (msg, a, q, y, s1, s2) {
     if(v1.equals(v2)) console.log("digital signature is valid! Eshta 3aleek ya Alice");
 }
 
+elgamal.generatePrivateKey = function(q) {
+    var key = Math.floor(Math.random() * (bigInt(q).minus(1) - 1) + 1);
+    console.log("generated private key is : " + bigInt(key).toString(16) + "\n");
+    return key;
+}
+
+elgamal.generatePublicKey = function(a, privateKey, q) {
+    var publicKey = bigInt(a).modPow(privateKey, q);
+    console.log("generated public key is : " + publicKey.toString(16) + "\n");
+    return publicKey;
+}
+
 var globals = require('./globals');
 var x = bigInt("AB",16);
 elgamal.sign("hamada", globals.q, globals.a, x);
-
+var privateKey = elgamal.generatePrivateKey(globals.q);
+elgamal.generatePublicKey(globals.a, privateKey, globals.q);
 module.exports = elgamal;
 
