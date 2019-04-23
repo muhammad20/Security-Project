@@ -3,6 +3,7 @@ const http = require('http');
 const url = require('url');
 const path = require('path');
 const _data = require('./../file_handler');
+const NodeRSA = require('node-rsa');
 
 // Declare the server template
 const server = {}
@@ -32,11 +33,19 @@ server.reqHandler = function(req,res){
     if(method=="get" && id ){
         
         // Try to read the certificate of the user with this id
-        _data.read(__dirname+"/certificates",id,"cert",function(err,data){
+        _data.read(__dirname+"/certificates",id,"crt",function(err,certificate){
             // If there is a certificate for this id 
-            if(!err && data){
-                res.writeHead(200);
-                res.end(data);
+            if(!err && certificate){
+                _data.read(__dirname+"/keys","private","key",function(err,privateKey){
+                    const key = new NodeRSA(privateKey);
+                    
+                    res.writeHead(200);
+                    const sent = key.encryptPrivate(certificate,'base64');
+                    res.end(sent);
+                    
+                   
+                });
+                
             }else{ // No certificate
                 console.log(err);
                 res.writeHead(404)
@@ -59,3 +68,4 @@ server.init = function () {
 
 // runs the server
 server.init();
+
