@@ -13,7 +13,7 @@ const elgamal = {};
  * @param {*} a the prime generator
  * @param {*} x the private key
  */
-elgamal.sign = async function elgamalDS(msg, q, a, x) {
+elgamal.sign =  function elgamalDS(msg, q, a, x, callback) {
     var hash = sha256.hash(msg);
 
     var m = utils.buf2bigInt(hash);
@@ -50,7 +50,7 @@ elgamal.sign = async function elgamalDS(msg, q, a, x) {
     }
     console.log("s2 is: " + s2.toString(16));
     var signature = [s1, s2];
-    return signature;
+    callback(signature);
 }
 
 /**
