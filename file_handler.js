@@ -19,4 +19,38 @@ lib.read = function (dir, file,extension,callback) {
     });
 };
 
+// Update a file
+lib.update = function(dir, filename, data, callback){
+    fs.open(lib.baseDir + dir + '/' + filename + '.json', 'r+',function(err,fileDescriptor){
+        if(!err && fileDescriptor){
+            var dataString = JSON.stringify(data);
+            // Truncate the file
+            fs.truncate(fileDescriptor, function(err){
+                if(!err){
+                    // Write to the file
+                    fs.write(fileDescriptor,dataString,function(err){
+                        if(err){
+                            callback('Error writing to the file');
+                        }else{
+                            // Close the file
+                            fs.close(fileDescriptor,function(err){
+                                if(!err){
+                                    callback(false);
+                                }else{
+                                    callback("Error closing the file");
+                                }
+                            });
+                        }
+                    });
+                    
+                }else{
+                    callback('Error truncating the file');
+                }
+            });
+        }else{
+            callback("Couldn't open the file for updateing, it may not exist yet");
+        }
+    });
+}
+
 module.exports = lib;

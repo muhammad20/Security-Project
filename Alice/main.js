@@ -5,6 +5,7 @@ const StringDecoder = require('string_decoder').StringDecoder;
 const globals = require('./../globals');
 const NodeRSA = require('node-rsa');
 const fileHandler = require('./../file_handler');
+const openssl =   require('openssl-wrapper').exec;
 
 // Send a get request to the certificate authority with query string parameter with pop's id 
 const getBobsCertificate = function (callback) {
@@ -37,15 +38,15 @@ const getBobsCertificate = function (callback) {
 
 
 // Verify the certificate by decrypting it with the authority public key 
-const verifyCertificate = function (certificate, callback) {
+const verifyCertificate = function (certificate) {
    
  
     var k2 = new NodeRSA(globals.authorityPublicKey,'pkcs8-public');
   
     const recData = k2.decryptPublic(certificate,'utf8');
  
-    
-
+    // If the resulting string contains the word "CERTIFICATE" then it's valid
+    return recData.includes("CERTIFICATE");
 
 }
 
@@ -53,11 +54,9 @@ const verifyCertificate = function (certificate, callback) {
 const sendBob = function () {
     // Get bob's certificate
     getBobsCertificate( function(certificate){
-        // Verify bob's certificate
-        
-        verifyCertificate(certificate,function(){
-
-        } );
+        // Verify bob's certificate   
+       var valid =  verifyCertificate(certificate);
+        console.log(valid);
     });
     
 
@@ -72,3 +71,11 @@ const sendBob = function () {
 };
 
 sendBob();
+
+
+const extractPublicKeyFromCertificate = function extractPublicKeyFromCertificate(certificate){
+    openssl('x509',certificate,  {inform: 'der',  outform: 'pem'}, function(err, buffer) {
+        return buffer.toString();
+    });
+}
+

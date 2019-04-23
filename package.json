@@ -5,6 +5,7 @@
     "big-integer": "^1.6.43",
     "fast-sha256": "^1.1.0",
     "node-rsa": "^1.0.5",
+    "openssl-wrapper": "^0.3.4",
     "socket.io": "^2.2.0"
   }
 }
