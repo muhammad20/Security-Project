@@ -4,6 +4,8 @@ var sha256 = require('fast-sha256');
 var bigInt = require('big-integer');
 var utils = require('./utils');
 
+const elgamal = {};
+
 /**
  * 
  * @param {*} msg the message to be hashed
@@ -11,7 +13,7 @@ var utils = require('./utils');
  * @param {*} a the prime generator
  * @param {*} x the private key
  */
-async function elgamalDS(msg, q, a, x) {
+elgamal.sign = async function elgamalDS(msg, q, a, x) {
     var hash = sha256.hash(msg);
 
     var m = utils.buf2bigInt(hash);
@@ -50,7 +52,30 @@ async function elgamalDS(msg, q, a, x) {
     var signature = [s1, s2];
     return signature;
 }
+
+/**
+ * @param {*} msg the original message received
+ * @param {*} a the generator of the prime `q`
+ * @param {*} q the large prime
+ * @param {*} y the signer's public key
+ * @param {*} s1 the first part of the pair of the signature
+ * @param {*} s2 the second part of the pair of the signature
+ */
+elgamal.verify = function (msg, a, q, y, s1, s2) {
+    var mBuff = sha256.hash(msg);
+    var m = utils.buf2bigInt(mBuff);
+
+    var v1 = bigInt(a).modPow(m, q);
+    if(v1.isNegative()) v1.add(q);
+    var v2 = bigInt(y).modPow(s1,q).multiply(bigInt(s1).modPow(s2,q)).mod(q);
+    if(v2.isNegative) v2.add(q);
+
+    if(v1.equals(v2)) console.log("digital signature is valid! Eshta 3aleek ya Alice");
+}
+
 var globals = require('./globals');
 var x = bigInt("AB",16);
-elgamalDS("hamada", globals.q, globals.a, x);
+elgamal.sign("hamada", globals.q, globals.a, x);
+
+module.exports = elgamal;
 
