@@ -4,15 +4,20 @@ var globals = require('./../globals');
 var elgamal = require('./../elgamal-ds');
 const http = require('http');
 const NodeRSA = require('node-rsa');
+var bigInt = require('big-integer');
 const fileHandler = require('./../file_handler');
+const StringDecoder = require('string_decoder').StringDecoder;
+var KeyEncoder = require('key-encoder'),
+keyEncoder = new KeyEncoder('secp256k1')
 
-const getAliceCertificate = function(callback) {
 
-    var certRequest = http.request('http://localhost:9000/?id='+globals.aliceId, function(res) {
+const getAliceCertificate = function (callback) {
+
+    var certRequest = http.request('http://localhost:9000/?id=' + globals.aliceId, function (res) {
         var buffer = '';
-        var stringDecoder = new stringDecoder('utf-8');
+        var stringDecoder = new StringDecoder('utf-8');
 
-        res.on('data', function(data) {
+        res.on('data', function (data) {
             buffer += stringDecoder.write(data);
         });
 
@@ -25,42 +30,91 @@ const getAliceCertificate = function(callback) {
     certRequest.end();
 }
 
-//verify Alice's certificate with the authority's public key
-const verifyEncrypedCertificate = function(encryptedCertificate, callback) {
+/**
+ * @param {encryptedCertificate} the encrypted certificate received from the authority
+ * 
+ * Loads the public key of the authority, uses it to decrypt the certificate
+ * 
+ * @returns {string} with the decrypted certificate
+ */
+const decryptCertificate = function (encryptedCertificate) {
+
     var k2 = new NodeRSA(globals.authorityPublicKey, 'pkcs8-public');
-    const recData = k2.decryptPublic(certificate, 'utf-8');
-    return recData.includes('CERTIFICATE');
+
+    return k2.decryptPublic(encryptedCertificate, 'utf8');
+};
+
+
+/**
+ * @param {certificate} the certificate received from the authority after decryption
+ * 
+ * Verify the certificate by checking that the certificate after decryption has the format of 
+ * a legitimate certificate, and that the common name is the id of alice
+ * 
+ * @returns {bool} indicating if the certificate is valid
+ */
+const verifyCertificate = function (certificate, id) {
+
+    return certificate.includes("CERTIFICATE") && extractCommonNameFromCertificate(certificate) == id;
+
 }
 
-const verifyAliceSignature = function(certificate) {
-    verifyEncrypedCertificate()
+/**
+ * @param {certificate} the certificate received from the authority after decryption
+ * 
+ * Extracts ElGamal public key from the certificate
+ * 
+ * @returns {string} ElGamal public key
+ */
+const extractElGamalPublicKeyFromCertificate = function (certificate) {
+    var pemKey = (certificate.split("-----END CERTIFICATE-----")[1]);
+    
+    return keyEncoder.encodePublic(pemKey,'pem','raw');
+    ;
 }
 
-const readAlicesMessage = function() {
-    fileHandler.read(__dirname + "../", "msg","txt", function(err, msg) {
-        if(!err && msg) {
-            fileHandler.read(__dirname + "/keys", "private", "key", function(err, key) {
-                var bob_private_key = new NodeRSA(key);
-                var decryptedMessage = bob_private_key.decrypt(msg);
-                callback(decryptedMessage);
+
+const extractCommonNameFromCertificate = function (certificate) {
+    return true;
+}
+
+
+
+
+
+const readAlicesMessage = function () {
+    
+    fileHandler.read(__dirname + ".\\..\\", "msg", "txt", function (err, fullMsg) {
+        if (!err && fullMsg) {
+            const msg = fullMsg.split("\n")[0];
+            var S1 = fullMsg.split("\n")[1];
+            var S2 = fullMsg.split("\n")[2];
+            
+            fileHandler.read(__dirname + "\\keys", "rsa_private", "key", function (err, key) {
+                
+                if (!err && key) {
+                    var bob_private_key = new NodeRSA(key, 'pkcs1');
+                    var decryptedMessage = bob_private_key.decrypt(msg, 'utf8');
+                    
+                    
+                    getAliceCertificate(function (encryptedCertificate) {
+                        const certificate = decryptCertificate(encryptedCertificate);
+                        const isValid = verifyCertificate(certificate, globals.aliceId);
+                        if (isValid) {
+                            const elGamalPublicKey = extractElGamalPublicKeyFromCertificate(certificate);
+                            S1=S1.replace(/(\r\n|\n|\r)/gm,"");
+                            S2=S2.replace(/(\r\n|\n|\r)/gm,"");
+                            elgamal.verify(decryptedMessage, globals.a, globals.q, elGamalPublicKey, bigInt(S1,16), bigInt(S2,16));
+                            console.log("\n\n\n"+elGamalPublicKey+"\n\n"+decryptedMessage+"\n"+S1+"\n\n"+S2+"\n\n");
+                        }
+                    });
+                }
             });
         }
     });
 }
 
-const receiveMsg = function() {
-    var msg = readAlicesMessage();
-    var aliceCert;
-    getAliceCertificate(function(cert) {
-        aliceCert = cert;
-    });
-    
-}
 
 
-// a test case used @ elgamal-ds
-var msg = "hamada";
-var y = bigInt("4a36568d7e49913d58d9b8b4b7e16f47c800cacbb67de8292299be4160f92ebe608f5a6ccfbd04fcf28ed8aed54fa275389ff612af8f50437b634e9d9b3664a5d91982965e57eb18df921c0f287aa92e499a9ed3633cbb8107db0d434f0d3d98edb1bcfb4040e2c52f74993356d2ec5e234e820abcf764b7b5de0f2986645a04", 16);
-var s1 = bigInt("9756266fccb7ad13b0df048440ae7810632f4ff740a31abab634ff7986afbfcabb59a521fc121a68d919987340e0ebec6ed25b3ad564266dbb05c33fbc189108abe294168793db8e1a3ad6eb0b652f120c1122c9e01977258e978c23f36e81df0981db0c3062436dfef89367f9d7d5116c0e161f465f12fd6c9f4cd777820935",16);
-var s2 = bigInt("7dfb3b9c998c417a7362983b00d44d7a752d975c0f00f2cd075f0349e7beedca65ed84e1cebbd76f2a8a436f86432b5e8468c32aa42353c3bffdfe5f65f7ede40e9bfc622f13e9cf828fbbc63f0703160c050e14093c734d874eb3451bf607940ef3aca37809fffaa6024be95f6430edfa7e57ea5f117bf7296fff22f73c8cf5",16);
-elgamal.verify(msg, globals.a, globals.q, y, s1, s2);
+
+readAlicesMessage();

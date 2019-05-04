@@ -20,15 +20,15 @@ lib.read = function (dir, file,extension,callback) {
 };
 
 // Update a file
-lib.update = function(dir, filename, data, callback){
-    fs.open(lib.baseDir + dir + '/' + filename + '.json', 'r+',function(err,fileDescriptor){
+lib.update = function(dir, filename, extension, data, callback){
+    fs.open( dir + '/' + filename + '.'+extension, 'r+',function(err,fileDescriptor){
         if(!err && fileDescriptor){
-            var dataString = JSON.stringify(data);
+            
             // Truncate the file
             fs.truncate(fileDescriptor, function(err){
                 if(!err){
                     // Write to the file
-                    fs.write(fileDescriptor,dataString,function(err){
+                    fs.write(fileDescriptor,data,function(err){
                         if(err){
                             callback('Error writing to the file');
                         }else{
@@ -52,5 +52,41 @@ lib.update = function(dir, filename, data, callback){
         }
     });
 }
+
+
+// Write data to a new file
+// @dir : subfolder name
+// @file : file name
+// @data : data to be written
+// @callback : callback function that takes an error string
+lib.create = function (dir, filename, extension, data, callback) {
+    // Open the file
+    fs.open(dir + '/' + filename + '.'+extension, 'wx', function (err, fileDescriptor) {
+        if (!err && fileDescriptor) {
+            
+
+            // Write data to the file
+            fs.write(fileDescriptor, data, function (err) {
+                if (!err) {
+                    // Close the file
+                    fs.close(fileDescriptor, function (err) {
+                        if (!err) {
+                            callback(false);
+                        } else {
+                            callback('Error closing the file');
+                        }
+                    });
+                } else {
+                    // 
+                    callback('Error writing to the file');
+                }
+            })
+        } else {
+           
+            callback("Couldn't make new file. It may already exists");
+        }
+    })
+}
+
 
 module.exports = lib;

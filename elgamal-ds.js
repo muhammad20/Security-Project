@@ -20,7 +20,7 @@ elgamal.sign =  function elgamalDS(msg, q, a, x, callback) {
     console.log("message hash: " + m.toString(16) + "\n");
 
     var q_1 = bigInt(q).minus(1);
-
+    x=bigInt(x,16);
     console.log("private key: " + x.toString(16) + "\n");
 
     //compute the public key:
@@ -64,17 +64,21 @@ elgamal.sign =  function elgamalDS(msg, q, a, x, callback) {
 elgamal.verify = function (msg, a, q, y, s1, s2) {
     var mBuff = sha256.hash(msg);
     var m = utils.buf2bigInt(mBuff);
-
+    
     var v1 = bigInt(a).modPow(m, q);
     if(v1.isNegative()) v1.add(q);
-    var v2 = bigInt(y).modPow(s1,q).multiply(bigInt(s1).modPow(s2,q)).mod(q);
+    /*y=y.replace(/(\r\n|\n|\r)/gm,"");
+    s1=s1.replace(/(\r\n|\n|\r)/gm,"");
+    s2=s2.replace(/(\r\n|\n|\r)/gm,"");*/
+    //var v2 = bigInt(y,16).modPow(bigInt(s1.trim(),16),q).multiply(bigInt(s1.trim(),16).modPow(bigInt(s2,16),q)).mod(q);
+    var v2 = bigInt(y,16).modPow(s1,q).multiply(s1.modPow(s2,q)).mod(q);
     if(v2.isNegative) v2.add(q);
 
     if(v1.equals(v2)) console.log("digital signature is valid! Eshta 3aleek ya Alice");
 }
 
 elgamal.generatePrivateKey = function(q) {
-    var key = Math.floor(Math.random() * (bigInt(q).minus(1) - 1) + 1);
+    var key = bigInt.randBetween(1,q.minus(1));
     console.log("generated private key is : " + bigInt(key).toString(16) + "\n");
     return key;
 }
@@ -85,10 +89,10 @@ elgamal.generatePublicKey = function(a, privateKey, q) {
     return publicKey;
 }
 
-var globals = require('./globals');
+/*var globals = require('./globals');
 var x = bigInt("AB",16);
 elgamal.sign("hamada", globals.q, globals.a, x);
 var privateKey = elgamal.generatePrivateKey(globals.q);
-elgamal.generatePublicKey(globals.a, privateKey, globals.q);
+elgamal.generatePublicKey(globals.a, privateKey, globals.q);*/
 module.exports = elgamal;
 

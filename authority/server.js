@@ -34,8 +34,10 @@ server.reqHandler = function(req,res){
         
         // Try to read the certificate of the user with this id
         _data.read(__dirname+"/certificates",id,"crt",function(err,certificate){
+            
             // If there is a certificate for this id 
             if(!err && certificate){
+            
                 _data.read(__dirname+"/keys","private","key",function(err,privateKey){
                     const key = new NodeRSA(privateKey);
                     

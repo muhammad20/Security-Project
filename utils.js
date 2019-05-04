@@ -1,5 +1,5 @@
 utils = {}
-var bigInt = require('big-integer')
+var bigInt = require('big-integer');
 
 //convert Uint8Array to a single BigInt 
 utils.buf2bigInt = function(buf) {
@@ -12,7 +12,7 @@ utils.buf2bigInt = function(buf) {
         hex.push(h);
     });
 
-    return BigInt('0x' + hex.join(''));
+    return bigInt(  hex.join(''),16);
 }
 
 // returns the greatest common divisor of x and y
