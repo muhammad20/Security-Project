@@ -8,7 +8,7 @@
     "elliptic": "^6.5.3",
     "fast-sha256": "^1.1.0",
     "key-encoder": "^1.1.7",
-    "node-forge": "^0.8.2",
+    "node-forge": "^0.10.0",
     "node-rsa": "^1.0.5",
     "openssl-wrapper": "^0.3.4",
     "socket.io": "^2.2.0"
