@@ -11,6 +11,6 @@
     "node-forge": "^0.8.2",
     "node-rsa": "^1.0.5",
     "openssl-wrapper": "^0.3.4",
-    "socket.io": "^2.2.0"
+    "socket.io": "^2.4.0"
   }
 }
