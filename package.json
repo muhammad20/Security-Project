@@ -5,7 +5,7 @@
     "@fidm/x509": "^1.2.1",
     "big-integer": "^1.6.43",
     "elgamal": "^0.3.0",
-    "elliptic": "^6.5.3",
+    "elliptic": "^6.5.4",
     "fast-sha256": "^1.1.0",
     "key-encoder": "^1.1.7",
     "node-forge": "^0.8.2",
